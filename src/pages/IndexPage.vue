@@ -65,7 +65,7 @@ onMounted(() => {
     GoogleAuth.initialize({
       clientId: CLIENT_ID_WEB,
       scopes: ['profile', 'email'],
-      grantOfflineAccess: true,
+      grantOfflineAccess: false, // se puso en false
     })
   }
 })

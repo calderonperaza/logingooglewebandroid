@@ -118,3 +118,9 @@ ID de cliente
 
 Secreto del cliente
 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
+
+en index.html head he puesto esto
+<meta
+      name="google-signin-client_id"
+      content="205298612426-934ctufpon5pfhap4sl9rvopf7ios2ra.apps.googleusercontent.com"
+    />
