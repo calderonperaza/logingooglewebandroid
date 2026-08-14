@@ -42,7 +42,8 @@ se agrega capacitor al proyecto de quasar
 quasar mode add capacitor
 
 Luego se agrega el plugin
-npm install @codetrix-studio/capacitor-google-auth
+npm install @codetrix-studio/capacitor-google-auth ya no esta falla
+npm install @capgo/capacitor-social-login
 
 Paso 4: Obtener las Credenciales en Google Cloud Console
 Ve a Google Cloud Console.
@@ -118,9 +119,3 @@ ID de cliente
 
 Secreto del cliente
 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
-
-en index.html head he puesto esto
-<meta
-      name="google-signin-client_id"
-      content="205298612426-934ctufpon5pfhap4sl9rvopf7ios2ra.apps.googleusercontent.com"
-    />

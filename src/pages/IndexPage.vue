@@ -2,7 +2,6 @@
   <q-page class="flex flex-center">
     <div class="column items-center q-gutter-y-md" style="max-width: 400px; width: 100%">
       <q-icon name="account_circle" size="80px" color="primary" />
-
       <div class="text-h5 text-bold">Google Auth Demo</div>
 
       <template v-if="!user">
@@ -22,22 +21,14 @@
           <q-item>
             <q-item-section avatar>
               <q-avatar>
-                <img :src="user.imageUrl" alt="Avatar" />
+                <img :src="user.profile?.imageUrl" alt="Avatar" />
               </q-avatar>
             </q-item-section>
             <q-item-section>
-              <q-item-label class="text-weight-bold">{{ user.displayName }}</q-item-label>
-              <q-item-label caption>{{ user.email }}</q-item-label>
+              <q-item-label class="text-weight-bold">{{ user.profile?.name }}</q-item-label>
+              <q-item-label caption>{{ user.profile?.email }}</q-item-label>
             </q-item-section>
           </q-item>
-
-          <q-separator />
-
-          <q-card-section>
-            <div class="text-caption text-grey-8 ellipsis-3-lines">
-              <strong>ID Token:</strong> {{ user.authentication?.idToken }}
-            </div>
-          </q-card-section>
 
           <q-card-actions align="right">
             <q-btn flat color="negative" label="Cerrar Sesión" @click="signOut" />
@@ -50,33 +41,42 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { GoogleAuth } from '@codetrix-studio/capacitor-google-auth'
-import { Capacitor } from '@capacitor/core'
+import { SocialLogin } from '@capgo/capacitor-social-login'
 import { useQuasar } from 'quasar'
 
 const $q = useQuasar()
 const user = ref(null)
 
-const CLIENT_ID_WEB = '205298612426-934ctufpon5pfhap4sl9rvopf7ios2ra.apps.googleusercontent.com'
+//const WEB_CLIENT_ID = '205298612426-934ctufpon5pfhap4sl9rvopf7ios2ra.apps.googleusercontent.com'
+//nuevo capgo
+const WEB_CLIENT_ID = '205298612426-rf8pnig8lq8srqd3ftokaeku2tb9v328.apps.googleusercontent.com'
 
-onMounted(() => {
-  // En plataforma Web se requiere llamar a initialize() explicitamente
-  if (Capacitor.getPlatform() === 'web') {
-    GoogleAuth.initialize({
-      clientId: CLIENT_ID_WEB,
-      scopes: ['profile', 'email'],
-      grantOfflineAccess: false, // se puso en false
+onMounted(async () => {
+  try {
+    await SocialLogin.initialize({
+      google: {
+        webClientId: WEB_CLIENT_ID,
+        mode: 'online',
+      },
     })
+  } catch (e) {
+    console.error('Error al inicializar SocialLogin:', e)
   }
 })
 
 const signIn = async () => {
   try {
-    const response = await GoogleAuth.signIn()
-    user.value = response
+    const result = await SocialLogin.login({
+      provider: 'google',
+      options: {
+        scopes: ['profile', 'email'],
+      },
+    })
+
+    user.value = result.result
     $q.notify({
       type: 'positive',
-      message: `¡Bienvenido ${response.givenName}!`,
+      message: `¡Bienvenido ${user.value.profile?.name || ''}!`,
     })
   } catch (error) {
     console.error('Error durante el inicio de sesión:', error)
@@ -89,7 +89,7 @@ const signIn = async () => {
 
 const signOut = async () => {
   try {
-    await GoogleAuth.signOut()
+    await SocialLogin.logout({ provider: 'google' })
     user.value = null
     $q.notify({
       type: 'info',
