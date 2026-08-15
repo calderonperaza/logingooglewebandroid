@@ -1,3 +1,10 @@
+/*
+Un composable en Vue 3 es una funcion reactiva y con acceso a estado y ciclo de vida
+En desarrollo web es muy común querer reutilizar funcionalidades que dependen de un estado reactivo y de ciclos de vida.
+
+
+*/
+
 import { ref, computed } from 'vue'
 
 // Estado reactivo global fuera de la función para compartirlo entre componentes
