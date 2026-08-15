@@ -44,7 +44,7 @@
 <script setup>
 import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in'
 import { useQuasar } from 'quasar'
-import { useAuth } from '/src/composables/UseAuth'
+import { useAuth } from '/src/composables/useAuth'
 
 import { useRouter } from 'vue-router'
 const $q = useQuasar()

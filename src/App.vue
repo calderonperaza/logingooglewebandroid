@@ -7,7 +7,7 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in'
 import { useQuasar } from 'quasar'
-import { useAuth } from '/src/composables/UseAuth'
+import { useAuth } from '/src/composables/useAuth'
 
 const $q = useQuasar()
 const router = useRouter()
