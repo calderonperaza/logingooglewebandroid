@@ -71,7 +71,7 @@
 </template>
 
 <script setup>
-import { useAuth } from '@/composables/UseAuth'
+import { useAuth } from '../composables/useAuth'
 import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
