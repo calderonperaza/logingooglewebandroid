@@ -41,9 +41,10 @@ See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-
 se agrega capacitor al proyecto de quasar
 quasar mode add capacitor
 
+https://www.npmjs.com/package/@capawesome/capacitor-google-sign-in
 Luego se agrega el plugin
-npm install @codetrix-studio/capacitor-google-auth ya no esta falla
-npm install @capgo/capacitor-social-login
+npm install @capawesome/capacitor-google-sign-in
+npx cap sync
 
 Paso 4: Obtener las Credenciales en Google Cloud Console
 Ve a Google Cloud Console.
@@ -58,12 +59,44 @@ en acceso a datos, aggrega los permisos:
 
 en publico vamos agregar los usuarios de prueba.
 
-en el clienteweb, haz clic y en origenes autorizados y url de redireecionamiento agrega [localhost:9000](http://localhost:9000)
+en el clienteweb, haz clic y en origenes autorizados y url de redireecionamiento agrega
+origenes:
+http://localhost
+http://localhost:9001
+redirec autorizados
+http://localhost:9001
+http://localhost:9001/
+http://localhost:9001/login
 
 Menu clientes
 En Credenciales, crea dos identificadores de cliente (Client IDs):
 
 ID de cliente de aplicación web: Copia este ID. Lo usarás como serverClientId y como clientId en la Web.
+
+EN LA APPS QUASAR
+se debe quitar el # de las rutas, en quasar.config.js
+vueRouterMode: 'history', // available values: 'hash', 'history'
+
+en src-capacitor/capacitor.config.js se configura el plugin con el id
+plugins: {
+GoogleSignIn: {
+scopes: ['profile', 'email'],
+clientId: '205298612426-rf8pnig8lq8srqd3ftokaeku2tb9v328.apps.googleusercontent.com',
+forceCodeForRefreshToken: true,
+},
+},
+
+Se crea un composable con la funciones principales
+UseAuth.js
+
+en App.vue se monta y se monitorea se hace login correctamente
+en router en index.js se configura la url de retorno luego de autenticarse
+se define la metadata si esta logueado en las rutas
+
+en LoginGoogle.vue se inicia sesion
+
+En MainLayout se muestra los datos del usuario logueado
+el usuario logueado se guarda en localstorage
 
 ID de cliente de Android:
 

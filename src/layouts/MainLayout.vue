@@ -1,22 +1,68 @@
 <template>
   <q-layout view="lHh Lpr lFf">
     <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+      <q-toolbar class="bg-primary text-white">
+        <q-btn flat dense round icon="menu" aria-label="Menu" />
 
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+        <q-toolbar-title> Mi App Quasar </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <!-- Contenedor del Usuario (se muestra si está autenticado) -->
+        <div v-if="isAuthenticated" class="row items-center q-gutter-x-sm">
+          <!-- Avatar + Menú desplegable -->
+          <q-btn flat round dense>
+            <q-avatar size="36px">
+              <img
+                v-if="user?.imageUrl || user?.picture"
+                :src="user?.imageUrl || user?.picture"
+                alt="Avatar"
+              />
+              <q-icon v-else name="person" />
+            </q-avatar>
+
+            <!-- Menú al hacer clic en el Avatar -->
+            <q-menu auto-close class="q-pa-md">
+              <div class="column items-center style-user-card" style="min-width: 200px">
+                <q-avatar size="60px" class="q-mb-sm">
+                  <img :src="user?.imageUrl || user?.picture" />
+                </q-avatar>
+
+                <div class="text-subtitle1 text-weight-bold">
+                  {{ user?.givenName || user?.name }} {{ user?.familyName || '' }}
+                </div>
+                <div class="text-caption text-grey-7 q-mb-md">{{ user?.email }}</div>
+
+                <q-btn
+                  color="negative"
+                  outline
+                  icon="logout"
+                  label="Cerrar Sesión"
+                  class="full-width"
+                  @click="handleSignOut"
+                />
+              </div>
+            </q-menu>
+          </q-btn>
+
+          <!-- Nombre visible solo en pantallas medianas o grandes (gt-xs) -->
+          <div class="gt-xs column text-left">
+            <span class="text-weight-bold text-body2">
+              {{ user?.givenName || user?.name }}
+            </span>
+            <span class="text-caption text-grey-3" style="font-size: 11px">
+              {{ user?.email }}
+            </span>
+          </div>
+
+          <!-- Botón de logout directo en el toolbar -->
+          <q-btn flat round dense icon="logout" color="white" @click="handleSignOut">
+            <q-tooltip>Cerrar Sesión</q-tooltip>
+          </q-btn>
+        </div>
+
+        <!-- Botón para ir al Login si no hay sesión -->
+        <q-btn v-else flat icon="login" label="Iniciar Sesión" to="/login" />
       </q-toolbar>
     </q-header>
-
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <EssentialLink v-for="link in linksList" :key="link.label" v-bind="link" />
-      </q-list>
-    </q-drawer>
 
     <q-page-container>
       <router-view />
@@ -25,57 +71,28 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import EssentialLink from '@/components/EssentialLink.vue'
+import { useAuth } from '@/composables/UseAuth'
+import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in'
+import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router'
 
-const linksList = [
-  {
-    label: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
-  },
-  {
-    label: 'GitHub',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    label: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    label: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    label: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    label: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    label: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
-  },
-]
+const $q = useQuasar()
+const router = useRouter()
+const { user, isAuthenticated, clearUser } = useAuth()
 
-const leftDrawerOpen = ref(false)
-
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value
+const handleSignOut = async () => {
+  try {
+    await GoogleSignIn.signOut()
+  } catch (error) {
+    console.warn('Advertencia al cerrar sesión:', error)
+  } finally {
+    clearUser()
+    $q.notify({
+      type: 'info',
+      message: 'Sesión cerrada correctamente',
+    })
+    // Redirigir a la pantalla de login
+    router.push('/login')
+  }
 }
 </script>

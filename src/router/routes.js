@@ -5,6 +5,11 @@ const routes = [
     children: [
       { path: '', component: () => import('@/pages/IndexPage.vue') },
       { path: 'login', component: () => import('@/pages/LoginGoogle.vue') },
+      {
+        path: 'pagina',
+        component: () => import('@/pages/PaginaRestringida.vue'),
+        meta: { requiresAuth: true }, //Requiere inicio de sesión
+      },
     ],
   },
 

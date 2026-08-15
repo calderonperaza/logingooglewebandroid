@@ -10,6 +10,15 @@
         class="full-width"
         to="/login"
       />
+      <q-btn
+        color="white"
+        text-color="black"
+        icon="lock"
+        label="Pagina restringida"
+        no-caps
+        class="full-width"
+        to="/pagina"
+      />
     </div>
   </q-page>
 </template>

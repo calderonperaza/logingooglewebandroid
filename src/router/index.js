@@ -34,5 +34,24 @@ export default defineRouter((/* { store, ssrContext } */) => {
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   })
 
+  // PARA LAS RUTAS RESTRINGIDAS A LOGIN
+  Router.beforeEach((to) => {
+    const isAuthenticated = !!localStorage.getItem('auth_user')
+
+    // 1. Si la ruta requiere auth y NO está autenticado -> Redirige a /login
+    if (to.matched.some((record) => record.meta.requiresAuth) && !isAuthenticated) {
+      return '/login'
+    }
+
+    // 2. Si ya está autenticado e intenta ir a /login -> Redirige al Home /
+    if (to.matched.some((record) => record.meta.requiresGuest) && isAuthenticated) {
+      return '/'
+    }
+
+    // 3. Si no cumple ninguna condición anterior, permite la navegación normal
+    return true
+  })
+  //PARA LAS RUTAS RESTRINGIDAS A LOGIN
+
   return Router
 })

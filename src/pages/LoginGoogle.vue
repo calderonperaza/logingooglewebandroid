@@ -4,7 +4,7 @@
       <q-icon name="account_circle" size="80px" color="primary" />
       <div class="text-h5 text-bold">Google Auth Demo</div>
 
-      <template v-if="!user">
+      <template v-if="!isAuthenticated">
         <q-btn
           color="white"
           text-color="black"
@@ -21,12 +21,14 @@
           <q-item>
             <q-item-section avatar>
               <q-avatar>
-                <img :src="user.profile?.imageUrl" alt="Avatar" />
+                <img :src="user?.imageUrl || user?.picture" alt="Avatar" />
               </q-avatar>
             </q-item-section>
             <q-item-section>
-              <q-item-label class="text-weight-bold">{{ user.profile?.name }}</q-item-label>
-              <q-item-label caption>{{ user.profile?.email }}</q-item-label>
+              <q-item-label class="text-weight-bold">
+                {{ user?.givenName || user?.name }} {{ user?.familyName || '' }}
+              </q-item-label>
+              <q-item-label caption>{{ user?.email }}</q-item-label>
             </q-item-section>
           </q-item>
 
@@ -40,63 +42,48 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
-import { SocialLogin } from '@capgo/capacitor-social-login'
+import { GoogleSignIn } from '@capawesome/capacitor-google-sign-in'
 import { useQuasar } from 'quasar'
+import { useAuth } from '/src/composables/UseAuth'
 
+import { useRouter } from 'vue-router'
 const $q = useQuasar()
-const user = ref(null)
-
-//const WEB_CLIENT_ID = '205298612426-934ctufpon5pfhap4sl9rvopf7ios2ra.apps.googleusercontent.com'
-//nuevo capgo
-const WEB_CLIENT_ID = '205298612426-rf8pnig8lq8srqd3ftokaeku2tb9v328.apps.googleusercontent.com'
-
-onMounted(async () => {
-  try {
-    await SocialLogin.initialize({
-      google: {
-        webClientId: WEB_CLIENT_ID,
-        mode: 'online',
-      },
-    })
-  } catch (e) {
-    console.error('Error al inicializar SocialLogin:', e)
-  }
-})
-
+const { user, isAuthenticated, clearUser, setUser } = useAuth()
+const router = useRouter()
 const signIn = async () => {
   try {
-    const result = await SocialLogin.login({
-      provider: 'google',
-      options: {
-        scopes: ['profile', 'email'],
-      },
+    const result = await GoogleSignIn.signIn({
+      redirectUrl: window.location.origin,
     })
 
-    user.value = result.result
-    $q.notify({
-      type: 'positive',
-      message: `¡Bienvenido ${user.value.profile?.name || ''}!`,
-    })
+    // 📱 EN ANDROID/iOS NATIVO:
+    // La promesa resuelve DIRECTAMENTE aquí con el perfil del usuario (sin recargar la página).
+    if (result && result.user) {
+      setUser(result.user, result.idToken)
+
+      $q.notify({
+        type: 'positive',
+        message: `¡Bienvenido ${result.user.givenName || result.user.name || ''}!`,
+      })
+
+      router.push('/')
+    }
   } catch (error) {
     console.error('Error durante el inicio de sesión:', error)
-    $q.notify({
-      type: 'negative',
-      message: 'Error al iniciar sesión con Google',
-    })
   }
 }
 
 const signOut = async () => {
   try {
-    await SocialLogin.logout({ provider: 'google' })
-    user.value = null
+    await GoogleSignIn.signOut()
+  } catch (error) {
+    console.warn('Advertencia al cerrar sesión:', error)
+  } finally {
+    clearUser()
     $q.notify({
       type: 'info',
       message: 'Sesión cerrada correctamente',
     })
-  } catch (error) {
-    console.error('Error al cerrar sesión:', error)
   }
 }
 </script>
