@@ -73,10 +73,6 @@ En Credenciales, crea dos identificadores de cliente (Client IDs):
 
 ID de cliente de aplicación web: Copia este ID. Lo usarás como serverClientId y como clientId en la Web.
 
-EN LA APPS QUASAR
-se debe quitar el # de las rutas, en quasar.config.js
-vueRouterMode: 'history', // available values: 'hash', 'history'
-
 en src-capacitor/capacitor.config.js se configura el plugin con el id
 plugins: {
 GoogleSignIn: {
